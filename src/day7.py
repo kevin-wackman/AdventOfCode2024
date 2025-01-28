@@ -14,10 +14,15 @@ SAMPLE_DATA = ["190: 10 19",
 
 OPERATORS = [mul, add]
 
-def get_number_of_line_solutions(total, values):
+def concat(x, y):
+    return int(str(x) + (str(y)))
+
+OPERATORS_PART_2 = [mul, add, concat]
+
+def get_number_of_line_solutions(total, values, operators):
     totals = [values[0]]
     for val in values[1:]:
-        totals = [op(val, n) for n in totals for op in OPERATORS]
+        totals = [op(n, val) for n in totals for op in operators]
     return totals.count(total)
 
 def parse_line(line):
@@ -30,11 +35,14 @@ def parse_line(line):
 def main():
     lines = open_data_file_as_lines(DATA_FILE)
     # lines = SAMPLE_DATA
-    passing_lines = 0
+    passing_lines_1 = 0
+    passing_lines_2 = 0
     for line in lines:
         (total, values) = parse_line(line)
-        if get_number_of_line_solutions(total, values) > 0:
-            passing_lines += total
-    print(passing_lines)
+        if get_number_of_line_solutions(total, values, OPERATORS) > 0:
+            passing_lines_1 += total
+        if get_number_of_line_solutions(total, values, OPERATORS_PART_2) > 0:
+            passing_lines_2 += total
+    print(passing_lines_1, passing_lines_2)
 
 main()
