@@ -19,23 +19,30 @@ SAMPLE_INPUT = [
 def trailhead_summits(map, coords):
     # use BFS to find all valid summits
     paths = deque()
-    visited = set()
     summits = set()
     paths.append(coords)
-    visited.add(coords)
     while paths:
         position = paths.popleft()
         for neighbor in get_neighbors(position):
-            if (not is_in_bounds(map, neighbor)) or (neighbor in visited):
+            if (not is_in_bounds(map, neighbor)) or (not is_gentle_slope(map, position, neighbor)):
                 continue
-            if not is_gentle_slope(map, position, neighbor):
-                continue
-            visited.add(neighbor)
             if get_position(map, neighbor) == SUMMIT:
                 summits.add(neighbor)
             else: # Don't continue walking if it's a summit
                 paths.append(neighbor)
     return summits
+
+def trailhead_paths(map, coords):
+    # Use DFS to find all paths, don't need to track previous positions since we're going 
+    summit_paths = 0
+    for neighbor in get_neighbors(coords):
+        if (not is_in_bounds(map, neighbor)) or (not is_gentle_slope(map, coords, neighbor)):
+            continue
+        if get_position(map, neighbor) == SUMMIT:
+            summit_paths += 1
+        else:
+            summit_paths += trailhead_paths(map, neighbor)
+    return summit_paths
 
 def is_gentle_slope(map, start, neighbor):
     return get_position(map, neighbor) - get_position(map, start) == 1
@@ -72,6 +79,12 @@ def solve_part_1(map):
         total_summits += len(trailhead_summits(map, trailhead))
     return total_summits
 
+def solve_part_2(map):
+    total_paths = 0
+    trailheads = get_starting_positions(map)
+    for trailhead in trailheads:
+        total_paths += trailhead_paths(map, trailhead)
+    return total_paths  
 
 
 def main():
@@ -79,5 +92,6 @@ def main():
     # lines = SAMPLE_INPUT
     map = [string_to_digits(line) for line in lines]
     print(solve_part_1(map))
+    print(solve_part_2(map))
 
 main()
