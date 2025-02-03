@@ -1,5 +1,6 @@
 from enum import Enum
 from operator import add
+import re
 
 class Vector(Enum):
     UP = (-1,0)
@@ -50,3 +51,7 @@ def is_in_bounds(map, coords):
 
 def get_position(map, coords):
     return map[coords[0]][coords[1]]
+
+def extract_ints(string):
+    # Regular expression lovingly provided by chatGPT    
+    return list(map(int, re.findall(r'\d+', string)))  # Extract numbers and convert to integers
