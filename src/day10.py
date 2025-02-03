@@ -1,5 +1,5 @@
 from filehandling import open_data_file_as_lines
-from localutils import Vector, add_tuples, string_to_digits
+from localutils import Vector, get_neighbors, string_to_digits, is_in_bounds, get_position
 from collections import deque
 
 DATA_FILE = "day10in.txt"
@@ -54,23 +54,6 @@ def get_starting_positions(map):
             if value == START:
                 starts.add((x,y))
     return starts
-
-def get_position(map, coords):
-    return map[coords[0]][coords[1]]
-
-def is_in_bounds(map, coords):
-    max_x = len(map)
-    max_y = len(map[0])
-    (x,y) = coords
-    if (x < 0 or x >= max_x):
-        return False
-    return (y >= 0 and y < max_y)
-
-def get_neighbors(coords):
-    neighbors = []
-    for vector in Vector:
-        neighbors.append(add_tuples(coords, vector.value))
-    return neighbors
 
 def solve_part_1(map):
     total_summits = 0
