@@ -2,6 +2,7 @@ from filehandling import open_data_file_as_lines
 from localutils import add_tuples
 from enum import Enum
 from collections import defaultdict
+import time
 
 DATA_FILE = "day14in.txt"
 SAMPLE_INPUT = [
@@ -52,11 +53,11 @@ class Robot:
             return Quadrant.NONE
         if quadrant_width_check > 0:
             if quadrant_height_check > 0:
-                return Quadrant.BOTTOM_RIGHT
-            return Quadrant.BOTTOM_LEFT
-        if quadrant_height_check > 0:
+                return Quadrant.TOP_LEFT
             return Quadrant.TOP_RIGHT
-        return Quadrant.TOP_LEFT
+        if quadrant_height_check > 0:
+            return Quadrant.BOTTOM_LEFT
+        return Quadrant.BOTTOM_RIGHT
 
 
 def parse_line(line, max_width = BOARD_WIDTH, max_height = BOARD_HEIGHT):
@@ -67,10 +68,37 @@ def parse_line(line, max_width = BOARD_WIDTH, max_height = BOARD_HEIGHT):
         parts.append((int(nums[0]), int(nums[1])))
     return Robot(parts[0], parts[1], max_width, max_height)
 
+def cycle_until_balanced(robots):
+    for robot in robots:
+        robot.cycle_n_times(63)
+    cycles = 63
+    hits = 0
+    while(cycles < 10403):
+        cycles += 103
+        quadrant_count = defaultdict(int)
+        for robot in robots:
+            robot.cycle_n_times(103)
+        print("After {} cycles, looks like this:".format(cycles))
+        print_robot_grid(robots)
+        time.sleep(0.5)
+    return 0
+
+def print_robot_grid(robots):
+    grid = []
+    for _ in range(BOARD_WIDTH):
+        row = []
+        for _ in range(BOARD_HEIGHT):
+            row.append('.')
+        grid.append(row)
+    for robot in robots:
+        (x,y) = robot.position
+        grid[x][y] = '*'
+    for row in grid:
+        print(''.join(row))
 
 def main():
     lines = open_data_file_as_lines(DATA_FILE)
-    #lines = SAMPLE_INPUT
+    # lines = SAMPLE_INPUT
     sample_max_width = 11
     sample_max_height = 7
     cycles = 100
@@ -85,8 +113,14 @@ def main():
         quadrant_count[quadrant] += 1
     quadrant_count[Quadrant.NONE] = 1
     total = 1
-    for robot_counts in quadrant_count.values():
+    for (quadrant, robot_counts) in quadrant_count.items():
+        print(quadrant, robot_counts)
         total *= robot_counts
     print(total)
+    # Rebuild robots for part 2
+    robots = []
+    for line in lines:
+        robots.append(parse_line(line))
+    cycle_until_balanced(robots)
 
 main()
