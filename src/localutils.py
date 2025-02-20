@@ -1,12 +1,27 @@
 from enum import Enum
 from operator import add
+from functools import total_ordering
 import re
 
+@total_ordering
 class Vector(Enum):
     UP = (-1,0)
     RIGHT = (0,1)
     DOWN = (1,0)
     LEFT = (0,-1)
+
+    def __lt__(self, other):
+        return self.value > other.value
+    
+VECTOR_SYMBOLS = {
+    Vector.UP: '^',
+    Vector.RIGHT: '>',
+    Vector.DOWN: 'v',
+    Vector.LEFT: '<',
+}
+
+def get_vector_symbol(vec):
+    return VECTOR_SYMBOLS.get(vec)
 
 def rotate_clockwise(vec):
     match vec:
@@ -18,6 +33,18 @@ def rotate_clockwise(vec):
             return Vector.LEFT
         case Vector.LEFT:
             return Vector.UP
+    raise ValueError("Invalid vector {} found".format(vec))
+
+def rotate_counter_clockwise(vec):
+    match vec:
+        case Vector.UP:
+            return Vector.LEFT
+        case Vector.RIGHT:
+            return Vector.UP
+        case Vector.DOWN:
+            return Vector.RIGHT
+        case Vector.LEFT:
+            return Vector.DOWN
     raise ValueError("Invalid vector {} found".format(vec))
 
 def apply_to_tuples(fn, t1, t2):
