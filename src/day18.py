@@ -1,5 +1,5 @@
 from filehandling import open_data_file_as_lines
-from localutils import Vector, get_neighbors, string_to_digits, is_in_bounds, get_position
+from localutils import Vector, get_neighbors, is_in_bounds, get_position
 from collections import deque
 
 
@@ -38,6 +38,7 @@ def find_shortest_path_length(board):
                     board[neighbor[0]][neighbor[1]] = move_count
                     new_queue.append(neighbor)
             move_queue = new_queue
+    return -1
 
 def corrupt_memory_location(board, coords):
     board[coords[0]][coords[1]] = CORRUPTED
@@ -48,10 +49,36 @@ def corrupt_n_squares(board, lines, n):
         coords = (int(int_line[0]), int(int_line[1]))
         corrupt_memory_location(board, coords)
 
+def clear_board(board):
+    for n, row in enumerate(board):
+        for m, square in enumerate(row):
+            if square not in [CORRUPTED, END_SQUARE]:
+                board[n][m] = SAFE
+    
+def find_first_blocking_square(corrupted_coords):
+    board = create_blank_board(BOARD_SIZE)
+    for coords in corrupted_coords:
+        corrupt_memory_location(board, coords)
+        if find_shortest_path_length(board) < 0:
+            return coords
+        clear_board(board)
+    print("L")
+
+def get_all_corrupted_coords(lines):
+    coords_list = []
+    for line in lines:
+        if line:
+            int_line = line.strip().split(',')
+            coords = (int(int_line[0]), int(int_line[1]))        
+            coords_list.append(coords)
+    return(coords_list)
+
 def main():
     lines = open_data_file_as_lines(DATA_FILE)
     board = create_blank_board(BOARD_SIZE)
     corrupt_n_squares(board, lines, 1024)
     print(find_shortest_path_length(board))
+    parsed_lines = get_all_corrupted_coords(lines)
+    print(find_first_blocking_square(parsed_lines))
 
 main()
