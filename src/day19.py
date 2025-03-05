@@ -18,18 +18,16 @@ TEST_DESIGNS = [
 @cache
 def is_valid_design(towels, design):
     if design == "":
-        return True
+        return 1
+    total = 0
     for towel in towels:
         if design.startswith(towel):
-            if is_valid_design(towels, design[len(towel):]):
-                return True
-    return False
+            total += is_valid_design(towels, design[len(towel):])
+    return total
 
 def process_input(lines):
     towels = tuple(word for word in lines[0].strip().split(', '))
-    print(towels)
     designs = [line.strip() for line in lines[2:]]
-    print(designs)
     return (towels, designs)
 
 def main():
@@ -37,8 +35,7 @@ def main():
     (towels, designs) = process_input(lines)
     total_valid_designs = 0
     for design in designs:
-        if is_valid_design(towels, design):
-            total_valid_designs += 1
+        total_valid_designs += is_valid_design(towels, design)
     print(total_valid_designs)
 
 main()
